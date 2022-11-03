@@ -19,9 +19,11 @@
 
 package com.github.shoothzj.kdash.service;
 
+import com.github.shoothzj.kdash.module.ScaleDeploymentReq;
 import com.github.shoothzj.kdash.module.CreateDeploymentReq;
 import com.github.shoothzj.kdash.util.KubernetesUtil;
 import io.kubernetes.client.openapi.ApiClient;
+import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1DeploymentSpec;
@@ -83,4 +85,19 @@ public class KubernetesDeployService {
                 "true", null, null, null);
     }
 
+    /**
+     * Scale up/down the number of pod in Deployment
+     *
+     * @param namespace
+     * @param req
+     * @throws ApiException
+     */
+    public void scaleDeployment(String namespace, ScaleDeploymentReq req) throws ApiException {
+        V1Deployment v1Deployment = new V1Deployment();
+        V1DeploymentSpec spec = new V1DeploymentSpec();
+        spec.setReplicas(req.getReplicasNum());
+        v1Deployment.setSpec(spec);
+        appsV1Api.replaceNamespacedDeployment(req.getDeployment(), namespace, v1Deployment, "true",
+                null, null, null);
+    }
 }
